@@ -26,7 +26,7 @@ contact page is my contacts along with a feedback component that logs the feedba
 
 
 
-leaderboardpage is the full leaderboard from the backend
+leaderboardpage is the full leaderboard from the backend along with a guide component and cool button component
 
 
 
@@ -35,6 +35,8 @@ leaderboardpage is the full leaderboard from the backend
 
 
 run both backend and frontend and go the frontend link.
+
+if tsx or vue is not install please install before running
 
 
 
