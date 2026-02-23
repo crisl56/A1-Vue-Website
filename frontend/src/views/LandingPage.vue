@@ -8,12 +8,15 @@
         <!-- Widgets -->
         <CounterWidget />
         <LeaderboardSummary />
+        <LoginStatus />
     </div>
 </template>
 
 <script setup lang="ts">
     import CounterWidget from "../components/CounterWidget.vue"; // .vue needs 
     import LeaderboardSummary from "../components/LeaderboardSummary.vue"; // .vue needs 
+    import LoginStatus from "../components/LoginStatusComponent.vue";
+
     // add more widgets here
 </script>
 

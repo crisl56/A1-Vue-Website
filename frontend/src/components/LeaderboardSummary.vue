@@ -36,11 +36,11 @@
     // it is changed everywhere
 
 
-    const leaderboardData = ref<LeaderBoardItem[]>([])
+    const leaderboardData = ref<LeaderboardItem[]>([])
     const errorMessage = ref("");
 
     async function fetchLeaderBoardData() {
-        const url = "http://localhost:3000/api/leaderboard-summary"
+        const url = "/api/leaderboard-summary"
         try {
             // This is getting the data 
             const response = await fetch(url);
@@ -54,6 +54,8 @@
             errorMessage.value = error?.message ?? "Unknown";
         }
     }
+
+
 
     onMounted(() => {
         fetchLeaderBoardData();

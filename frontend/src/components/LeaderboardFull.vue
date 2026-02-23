@@ -40,7 +40,7 @@
     const errorMessage = ref("");
 
     async function fetchLeaderBoardData() {
-        const url = "http://localhost:3000/api/leaderboard-full"
+        const url = "/api/leaderboard-full"
         try {
             // This is getting the data 
             const response = await fetch(url);
