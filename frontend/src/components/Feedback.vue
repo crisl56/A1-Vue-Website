@@ -28,8 +28,6 @@
 
         // clear the feedback input
         feedback.value = "";
-
-
     }
 
 </script>
