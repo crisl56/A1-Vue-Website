@@ -1,58 +1,108 @@
-import express, { type Request, type Response } from "express";
-import cors from "cors";
+import express from "express";
+import mysql from "mysql2/promise";
+import dotenv from "dotenv";
+
+const app = express();
+app.use(express.json());
+
+const pool = mysql.createPool({
+    host: process.env.sqlDB_HOST ?? "localhost",
+    user: process.env.sqlDB_USER,
+    password: process.env.sqlDB_PASSWORD,
+    database: process.env.sqlDB_NAME,
+    waitForConnections: true,
+    connectionLimit: 10
+});
 
 type LeaderboardItem = {
     player: string;
     score: number;
 };
 
-// define full leaderboard here
+let leaderboardData: LeaderboardItem[]
 
-let leadboardData: LeaderboardItem[] = [
-    { player: "Spencer", score: 9998 },
-    { player: "Raf", score: 9997 },
-    { player: "Cris", score: 777 },
-    { player: "Dylan", score: 234 },
-    { player: "Vi", score: 226 },
-    { player: "Ken", score: 124 },
-    { player: "Felipe", score: 4123 },
-    { player: "Vinnicius", score: 543 },
-    { player: "Nick", score: 564 },
-    { player: "Kiran", score: 442 },
-    { player: "Julian", score: 754 },
-]
+async function GetLeaderBoard() {
+    const db = await mysql.createConnection({
+        host: process.env.sqlDB_HOST ?? "localhost",
+        user: process.env.sqlDB_USER,
+        password: process.env.sqlDB_PASSWORD,
+        database: process.env.sqlDB_NAME,
+    });
+
+    try {
+        const [rows] = await db.execute(
+            "SELECT name AS player, score FROM leaderboard ORDER BY score DESC"
+        );
 
 
-const app = express();
-const PORT = 3000;
+        leaderboardData = rows as LeaderboardItem[];
 
-app.use(cors());
+        console.log(leaderboardData);
+    }
+    catch (err) {
+        console.log("Failed to get Database Info:", err);
+    }
+    finally {
+
+        await db.end();
+    }
+}
+
+//const PORT = Number(process.env.PORT);
+//app.listen(PORT, async () => {
+//    console.log(`API on http://localhost:${process.env.PORT}`);
+
+//    await GetLeaderBoard();
+//})
+
 app.use(express.json());
 
-app.get(`/api/ping`, (req: Request, res: Response) => {
+app.get(`/api/ping`, async (req: Request, res: Response) => {
+
+    await GetLeaderBoard();
+
     res.json({ message: "OK" });
 });
 
-app.get("/api/leaderboard-summary", (req: Request, res: Response) => {
-    const summaryData: LeaderboardItem[] = [
-        leadboardData[0], leadboardData[1], leadboardData[2], leadboardData[3], leadboardData[4]
-    ];
+app.get("/api/leaderboard-summary", async (req: Request, res: Response) => {
 
-    res.json(summaryData);
+    await GetLeaderBoard();
+
+    res.json(leaderboardData.slice(0, 5));
 });
 
-app.get("/api/leaderboard-full", (req: Request, res: Response) => {
-    // Add fetch here for full leadboard
+app.get("/api/leaderboard-full", async (req: Request, res: Response) => {
 
-    res.json(leadboardData);
+    await GetLeaderBoard();
+
+    res.json(leaderboardData);
 });
 
-// TODO: create a second fetch for only getting 5 elements for a summary
-//       or create a whole json file and make one that only gets 5 and another gets the whole
+// MONGO DB stuff
 
-app.listen(PORT, () => {
-    console.log(`Backend server is running at http://localhost:${PORT}`);
-});
+import { connectDB } from "./db";
 
-// gotta write the other ones
-// post, delete, etc
+import usersRoutes from "./src/routes/users.ts";
+import feedbackRoutes from "./src/routes/feedback.ts";
+
+dotenv.config();
+
+// lol using the same one in class :P
+app.get("/", (req, res) => res.json({ ok: true, service: "school-spencer-api" }));
+
+app.use("/api/users", usersRoutes);
+app.use("/api/feedbacks", feedbackRoutes);
+
+async function start() {
+    try {
+        await connectDB(process.env.MONGODB_URI);
+        const port = Number(process.env.PORT);
+        app.listen(port, () => console.log(`Listening on http:..localhost:${port}`))
+
+    } catch (err: any) {
+        console.error("Startup error", err?.message);
+        process.exit(1); // stopp all processes
+    }
+};
+
+start();

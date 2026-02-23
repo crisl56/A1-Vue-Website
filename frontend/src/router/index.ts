@@ -3,12 +3,14 @@ import LandingPage from "../views/LandingPage.vue";
 import AboutPage from "../views/AboutPage.vue";
 import LeaderBoardPage from "../views/LeaderboardPage.vue";
 import ContactsPage from "../views/ContactsPage.vue";
+import LoginPage from "../views/LoginPage.vue";
 
 const routes: RouteRecordRaw[] = [
     { path: "/", name: "Landing", component: LandingPage },
     { path: "/About", name: "About", component: AboutPage},
     { path: "/Leaderboard", name: "Leaderboard", component: LeaderBoardPage},
-    { path: "/Contacts", name: "Contacts", component: ContactsPage},
+    { path: "/Contacts", name: "Contacts", component: ContactsPage },
+    { path: "/Login", name: "Login", component: LoginPage}
 ];
 
 const router = createRouter({
